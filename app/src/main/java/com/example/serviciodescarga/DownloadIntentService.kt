@@ -56,6 +56,9 @@ class DownloadIntentService : IntentService("DownloadIntentService") {
                     } else {
                         // Read data on the worker thread
                         val responseData = response.body!!.string()
+                        //enviarRespuesta("fichero descargado ok")
+                        Log.i("Descarga: ", "fichero descargado: " + responseData)
+
                         // guardar el fichero descargado en memoria externa
                         if (escribirExterna(responseData)) {
                             Log.i("Descarga: ", "fichero descargado")
@@ -77,8 +80,9 @@ class DownloadIntentService : IntentService("DownloadIntentService") {
         val tarjeta: File
         lateinit var bw: BufferedWriter
         var correcto = false
+
         try {
-            tarjeta = Environment.getExternalStorageDirectory()
+            tarjeta = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             miFichero = File(tarjeta.absolutePath, "frases.html")
             bw = BufferedWriter(FileWriter(miFichero))
             bw.write(cadena)

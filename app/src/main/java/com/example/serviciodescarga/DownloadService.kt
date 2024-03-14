@@ -21,7 +21,7 @@ import java.net.URL
 class DownloadService : Service() {
     override fun onCreate() {
         super.onCreate()
-        mostrarMensaje("Creando el servicio . . .")
+        //mostrarMensaje("Creando el servicio . . .")
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {

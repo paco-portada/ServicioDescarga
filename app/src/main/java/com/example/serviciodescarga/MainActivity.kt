@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(view)
         binding.botonIniciar.setOnClickListener(this)
         binding.botonParar.setOnClickListener(this)
+
         intentFilter = IntentFilter(ACTION_RESP)
         intentFilter.addCategory(Intent.CATEGORY_DEFAULT)
         broadcastReceiver = ReceptorOperacion()
@@ -40,7 +41,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     public override fun onResume() {
         super.onResume()
         //---registrar el receptor ---
-        registerReceiver(broadcastReceiver, intentFilter)
+        registerReceiver(broadcastReceiver, intentFilter, RECEIVER_NOT_EXPORTED)
     }
 
     public override fun onPause() {
@@ -53,13 +54,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         override fun onReceive(context: Context, intent: Intent) {
             val respuesta = intent.getStringExtra("resultado")
+
             binding.salida.text = respuesta
-            // mostrarMensaje(respuesta);
+            mostrarMensaje(respuesta!!);
         }
     }
 
     override fun onClick(v: View) {
         binding.salida.text = ""
+        lateinit var i: Intent;
+
         if (v === binding.botonIniciar) {
             if (comprobarPermiso()) {
                 if (!binding.switch1.isChecked) {
@@ -67,7 +71,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     startService(Intent(this@MainActivity, DownloadService::class.java))
                 } else {
                     // uso con IntentService
-                    val i = Intent(this, DownloadIntentService::class.java)
+                    i = Intent(this, DownloadIntentService::class.java)
                     i.putExtra("web", WEB)
                     startService(i)
                 }
@@ -126,10 +130,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     DownloadService::class.java
                 )
             ) else  // no hay permiso
-            mostrarError("No se ha concedido permiso para conectarse a Internet")
+            mostrarMensaje("No se ha concedido permiso para escribir en memoria externa")
     }
 
-    private fun mostrarError(mensaje: String) {
+    private fun mostrarMensaje(mensaje: String) {
         Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
     }
 
