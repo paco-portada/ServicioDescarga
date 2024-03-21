@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Environment
 import android.util.Log
 import android.widget.Toast
+import com.example.serviciodescarga.Util.Memoria
+import com.example.serviciodescarga.Util.Memoria.escribirExterna
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -58,53 +60,17 @@ class DownloadIntentService : IntentService("DownloadIntentService") {
                         val responseData = response.body!!.string()
                         //enviarRespuesta("fichero descargado ok")
                         Log.i("Descarga: ", "fichero descargado: " + responseData)
-
                         // guardar el fichero descargado en memoria externa
-                        if (escribirExterna(responseData)) {
-                            Log.i("Descarga: ", "fichero descargado")
-                        } else {
-                            Log.e("Error ", "no se ha podido descargar")
-                        }
+                        enviarRespuesta("Descarga: fichero descargado de Internet OK")
+                        // guardar el fichero descargado en memoria externa
+                        val mensaje = Memoria.escribirExterna(responseData)
+                        //enviarRespuesta(mensaje)
+                        Log.i("Descarga: ", mensaje)
                     }
                 }
             }
         })
     }
-
-    private fun mostrarMensaje(mensaje: String) {
-        Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun escribirExterna(cadena: String?): Boolean {
-        val miFichero: File
-        val tarjeta: File
-        lateinit var bw: BufferedWriter
-        var correcto = false
-
-        try {
-            tarjeta = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            miFichero = File(tarjeta.absolutePath, "frases.html")
-            bw = BufferedWriter(FileWriter(miFichero))
-            bw.write(cadena)
-            Log.i("Información: ", miFichero.absolutePath)
-            enviarRespuesta("Descarga: fichero descargado OK" + miFichero.absolutePath)
-        } catch (e: IOException) {
-            if (cadena != null) Log.e("Error: ", cadena)
-            Log.e("Error de E/S", e.message.toString())
-            enviarRespuesta("Error: " + e.message)
-        } finally {
-            try {
-                if (bw != null) {
-                    bw.close()
-                    correcto = true
-                }
-            } catch (e: IOException) {
-                Log.e("Error al cerrar", e.message.toString())
-            }
-        }
-        return correcto
-    }
-
     private fun enviarRespuesta(mensaje: String) {
         val i = Intent()
         i.action = MainActivity.ACTION_RESP
